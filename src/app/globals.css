@@ -1,0 +1,151 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Yollr CSS Variables */
+:root {
+  --electric-peach: #FF7A5C;
+  --cosmic-pink: #FF5FCC;
+  --cyan-pop: #00E9FF;
+  --lime-pop: #C8FF3D;
+  --midnight: #0A0A0C;
+  --graphite: #232325;
+  --cloud: #F6F6F8;
+  
+  /* Glow colors for animations */
+  --glow-peach: rgba(255, 122, 92, 0.5);
+  --glow-pink: rgba(255, 95, 204, 0.5);
+  --glow-cyan: rgba(0, 233, 255, 0.5);
+  --glow-lime: rgba(200, 255, 61, 0.5);
+}
+
+/* Dark mode is default */
+html {
+  color-scheme: dark;
+}
+
+body {
+  color: var(--cloud);
+  background-color: var(--midnight);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overscroll-behavior: none;
+}
+
+/* Glassmorphism Card Styles */
+.glass-card {
+  background: rgba(35, 35, 37, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(246, 246, 248, 0.1);
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+}
+
+.glass-card-hover:hover {
+  background: rgba(35, 35, 37, 0.8);
+  border-color: rgba(246, 246, 248, 0.2);
+  transform: translateY(-2px);
+  transition: all 0.2s ease-out;
+}
+
+/* Gradient Text */
+.gradient-text {
+  background: linear-gradient(135deg, var(--electric-peach), var(--cosmic-pink));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Gradient Buttons */
+.gradient-btn {
+  background: linear-gradient(135deg, var(--electric-peach), var(--cosmic-pink));
+  position: relative;
+  overflow: hidden;
+}
+
+.gradient-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.gradient-btn:hover::before {
+  left: 100%;
+}
+
+/* Neon Glow Effects */
+.neon-glow-peach {
+  box-shadow: 0 0 10px var(--glow-peach);
+}
+
+.neon-glow-pink {
+  box-shadow: 0 0 10px var(--glow-pink);
+}
+
+.neon-glow-cyan {
+  box-shadow: 0 0 10px var(--glow-cyan);
+}
+
+.neon-glow-lime {
+  box-shadow: 0 0 10px var(--glow-lime);
+}
+
+/* Haptic Feedback Classes */
+.haptic-tap:active {
+  transform: scale(0.95);
+}
+
+.haptic-success {
+  animation: hapticSuccess 0.2s ease-out;
+}
+
+@keyframes hapticSuccess {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--graphite);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--cloud);
+  border-radius: 2px;
+}
+
+/* Selection Color */
+::selection {
+  background: var(--glow-pink);
+  color: var(--cloud);
+}
+
+/* Focus Styles */
+:focus-visible {
+  outline: 2px solid var(--cosmic-pink);
+  outline-offset: 2px;
+}
+
+/* Disable double-tap zoom on mobile */
+@media (pointer: coarse) {
+  .disable-double-tap {
+    touch-action: manipulation;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
