@@ -41,7 +41,7 @@ export const mapZodErrorToValidationCode = (zodError: z.ZodIssue): ValidationErr
   switch (zodError.code) {
     case 'invalid_type':
       return VALIDATION_ERROR_CODES.INVALID_INPUT;
-    case 'invalid_string':
+    case 'invalid_string' as any:
       // @ts-ignore - validation property exists on invalid_string errors
       if (zodError.validation === 'email') return VALIDATION_ERROR_CODES.INVALID_EMAIL;
       // @ts-ignore - validation property exists on invalid_string errors
@@ -55,7 +55,7 @@ export const mapZodErrorToValidationCode = (zodError: z.ZodIssue): ValidationErr
     case 'too_big':
       // @ts-ignore - type property exists on too_big errors
       return zodError.type === 'string' ? VALIDATION_ERROR_CODES.TOO_LONG : VALIDATION_ERROR_CODES.OUT_OF_RANGE;
-    case 'invalid_enum_value':
+    case 'invalid_enum_value' as any:
       return VALIDATION_ERROR_CODES.INVALID_ENUM;
     case 'custom':
       return VALIDATION_ERROR_CODES.INVALID_INPUT;
@@ -122,7 +122,7 @@ export const transformZodErrors = (zodError: z.ZodError): EnhancedValidationErro
     return createValidationError(
       field,
       err.message,
-      err.path.reduce((obj, key) => (obj as any)?.[key], undefined),
+      err.path.reduce((obj: any, key: any) => (obj as any)?.[key], undefined),
       code,
       'error',
       suggestions

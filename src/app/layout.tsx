@@ -1,19 +1,24 @@
-import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import type { Metadata, Viewport } from 'next';
+import { inter } from '@/lib/theme/fonts';
 import './globals.css';
-
-const inter = Inter({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700', '800'],
-  display: 'swap',
-});
 
 export const metadata: Metadata = {
   title: 'Yollr - Campus Social Feed',
-  description: 'The gamified campus social feed that brings your community together',
+  description: 'The viral campus social app that brings your community together',
   manifest: '/manifest.json',
-  themeColor: '#FF7A5C',
-  viewport: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'Yollr',
+  },
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  themeColor: '#080A0F',
 };
 
 export default function RootLayout({
@@ -22,17 +27,21 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="h-full bg-midnight">
+    <html lang="en" className="h-full">
       <head>
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link rel="manifest" href="/manifest.json" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="apple-mobile-web-app-title" content="Yollr" />
-        <meta name="theme-color" content="#0A0A0C" />
+        <meta name="theme-color" content="#080A0F" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
       </head>
-      <body className={`${inter.className} h-full overflow-hidden bg-midnight text-cloud`}>
+      <body
+        className={`${inter.variable} font-sans h-full overflow-hidden antialiased`}
+        style={{
+          background: '#080A0F',
+          color: 'rgba(247, 248, 250, 0.90)',
+        }}
+      >
         {children}
       </body>
     </html>

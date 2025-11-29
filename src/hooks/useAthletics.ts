@@ -106,9 +106,9 @@ export function useAthletics(campusId: string | null): UseAthleticsReturn {
     try {
       setError(null);
       
-      const { error: updateError } = await supabase
+      const { error: updateError } = await (supabase as any)
         .from('athletics_events')
-        .update(updates as any)
+        .update(updates)
         .eq('id', id);
 
       if (updateError) throw updateError;

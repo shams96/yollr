@@ -123,9 +123,25 @@ CREATE TYPE streak_type AS ENUM (
   'heist_participation'
 );
 
+CREATE TYPE campus_role AS ENUM (
+  'member',
+  'moderator',
+  'admin'
+);
+
+CREATE TYPE moderation_content_type AS ENUM (
+  'moment',
+  'heist_submission',
+  'poll'
+);
+
 -- =============================================
 -- TABLES
 -- =============================================
+
+-- Users table (phone-based authentication)
+-- Note: Using Supabase's built-in auth.users table
+-- No need to create a users table - Supabase manages this
 
 -- Profiles table (extends auth.users)
 CREATE TABLE profiles (
@@ -155,11 +171,15 @@ CREATE TABLE campuses (
   campus_type campus_type NOT NULL,
   domain TEXT,
   location GEOGRAPHY(POINT, 4326),
+  latitude DECIMAL(10, 8),
+  longitude DECIMAL(11, 8),
+  zip_code TEXT,
   address TEXT,
   city TEXT,
   state TEXT,
   country TEXT,
   timezone TEXT NOT NULL DEFAULT 'America/New_York',
+  enrollment INTEGER DEFAULT 0,
   primary_color TEXT,
   secondary_color TEXT,
   logo_url TEXT,
@@ -179,16 +199,19 @@ CREATE TABLE campus_memberships (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id UUID NOT NULL REFERENCES profiles(id) ON DELETE CASCADE,
   campus_id UUID NOT NULL REFERENCES campuses(id) ON DELETE CASCADE,
-  role TEXT DEFAULT 'member' NOT NULL CHECK (role IN ('member', 'moderator', 'admin')),
+  role campus_role DEFAULT 'member' NOT NULL,
   joined_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
   left_at TIMESTAMPTZ,
   is_active BOOLEAN DEFAULT true NOT NULL,
-  CONSTRAINT unique_active_membership UNIQUE (user_id, campus_id, is_active) WHERE is_active = true
+  created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+  CONSTRAINT unique_user_campus UNIQUE (user_id, campus_id)
 );
 
 CREATE INDEX idx_campus_memberships_user ON campus_memberships(user_id);
 CREATE INDEX idx_campus_memberships_campus ON campus_memberships(campus_id);
 CREATE INDEX idx_campus_memberships_active ON campus_memberships(is_active) WHERE is_active = true;
+CREATE UNIQUE INDEX idx_unique_active_membership ON campus_memberships(user_id, campus_id) WHERE is_active = true;
 
 -- Squads
 CREATE TABLE squads (
@@ -219,10 +242,13 @@ CREATE TABLE squad_members (
   joined_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
   left_at TIMESTAMPTZ,
   is_active BOOLEAN DEFAULT true NOT NULL,
-  CONSTRAINT unique_squad_membership UNIQUE (squad_id, user_id, is_active) WHERE is_active = true
+  created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+  CONSTRAINT unique_squad_user UNIQUE (squad_id, user_id)
 );
 
 CREATE INDEX idx_squad_members_squad ON squad_members(squad_id);
+CREATE UNIQUE INDEX idx_unique_active_squad_membership ON squad_members(squad_id, user_id) WHERE is_active = true;
 CREATE INDEX idx_squad_members_user ON squad_members(user_id);
 CREATE INDEX idx_squad_members_active ON squad_members(is_active) WHERE is_active = true;
 
@@ -272,7 +298,8 @@ CREATE TABLE poll_options (
   option_text TEXT NOT NULL,
   vote_count INTEGER DEFAULT 0 NOT NULL,
   position INTEGER NOT NULL,
-  created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
+  created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
 );
 
 CREATE INDEX idx_poll_options_poll ON poll_options(poll_id);
@@ -335,6 +362,7 @@ CREATE TABLE heist_submissions (
   video_url TEXT,
   vote_count INTEGER DEFAULT 0 NOT NULL,
   is_winner BOOLEAN DEFAULT false NOT NULL,
+  is_active BOOLEAN DEFAULT true NOT NULL,
   created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
   updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL
 );
@@ -388,6 +416,25 @@ CREATE INDEX idx_moments_event ON moments(athletics_event_id);
 CREATE INDEX idx_moments_expires ON moments(expires_at);
 CREATE INDEX idx_moments_active ON moments(is_active) WHERE is_active = true;
 CREATE INDEX idx_moments_created ON moments(created_at DESC);
+
+-- Yollr Bell Events
+CREATE TABLE bell_events (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  campus_id UUID NOT NULL REFERENCES campuses(id) ON DELETE CASCADE,
+  triggered_at TIMESTAMPTZ NOT NULL,
+  expires_at TIMESTAMPTZ NOT NULL,
+  participants_count INTEGER DEFAULT 0 NOT NULL,
+  moments_count INTEGER DEFAULT 0 NOT NULL,
+  is_active BOOLEAN DEFAULT true NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+  updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL,
+  CONSTRAINT valid_bell_duration CHECK (expires_at > triggered_at)
+);
+
+CREATE INDEX idx_bell_events_campus ON bell_events(campus_id);
+CREATE INDEX idx_bell_events_triggered ON bell_events(triggered_at DESC);
+CREATE INDEX idx_bell_events_expires ON bell_events(expires_at);
+CREATE INDEX idx_bell_events_active ON bell_events(is_active, expires_at) WHERE is_active = true;
 
 -- Reactions
 CREATE TABLE reactions (
@@ -547,7 +594,7 @@ CREATE INDEX idx_campus_legacy_stats_campus ON campus_legacy_stats(campus_id);
 -- Moderation queue
 CREATE TABLE moderation_queue (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  content_type TEXT NOT NULL CHECK (content_type IN ('moment', 'heist_submission', 'poll')),
+  content_type moderation_content_type NOT NULL,
   content_id UUID NOT NULL,
   campus_id UUID NOT NULL REFERENCES campuses(id) ON DELETE CASCADE,
   reporter_id UUID REFERENCES profiles(id) ON DELETE SET NULL,
@@ -1064,8 +1111,7 @@ CREATE POLICY "Moderators can update moderation items"
 CREATE POLICY "Users can report content"
   ON moderation_queue FOR INSERT
   WITH CHECK (
-    user_id = auth.uid()
-    AND reporter_id = auth.uid()
+    reporter_id = auth.uid()
     AND status = 'pending'
   );
 
@@ -1387,7 +1433,7 @@ BEGIN
     c.id,
     DATE_TRUNC('week', NOW()),
     COUNT(DISTINCT cm.user_id),
-    COUNT(DISTINCT CASE WHEN u.last_activity_at >= NOW() - INTERVAL '7 days' THEN cm.user_id END),
+    COUNT(DISTINCT CASE WHEN ux.created_at >= NOW() - INTERVAL '7 days' THEN cm.user_id END),
     COUNT(DISTINCT m.id),
     COUNT(DISTINCT p.id),
     COUNT(DISTINCT hs.id),
@@ -1395,7 +1441,7 @@ BEGIN
     COALESCE(SUM(ux.xp_amount), 0),
     CASE 
       WHEN COUNT(DISTINCT cm.user_id) > 0 THEN 
-        ROUND((COUNT(DISTINCT CASE WHEN u.last_activity_at >= NOW() - INTERVAL '7 days' THEN cm.user_id END)::DECIMAL / 
+        ROUND((COUNT(DISTINCT CASE WHEN ux.created_at >= NOW() - INTERVAL '7 days' THEN cm.user_id END)::DECIMAL / 
          COUNT(DISTINCT cm.user_id) * 100), 2)
       ELSE 0
     END
@@ -1455,7 +1501,27 @@ $$ LANGUAGE plpgsql;
 -- Enqueue for moderation
 CREATE OR REPLACE FUNCTION fn_enqueue_for_moderation()
 RETURNS TRIGGER AS $$
+DECLARE
+  v_content_type moderation_content_type;
+  v_campus_id UUID;
 BEGIN
+  -- Map table name to moderation_content_type enum and campus_id
+  IF TG_TABLE_NAME = 'moments' THEN
+    v_content_type := 'moment';
+    v_campus_id := NEW.campus_id;
+
+  ELSIF TG_TABLE_NAME = 'heist_submissions' THEN
+    v_content_type := 'heist_submission';
+    SELECT h.campus_id
+    INTO v_campus_id
+    FROM heists h
+    WHERE h.id = NEW.heist_id;
+
+  ELSE
+    -- Unknown table: do nothing
+    RETURN NEW;
+  END IF;
+
   INSERT INTO moderation_queue (
     content_type,
     content_id,
@@ -1464,9 +1530,9 @@ BEGIN
     reason
   )
   VALUES (
-    TG_TABLE_NAME,
+    v_content_type,
     NEW.id,
-    NEW.campus_id,
+    v_campus_id,
     'pending',
     'Auto-flagged for review'
   );
@@ -1546,12 +1612,12 @@ CREATE OR REPLACE FUNCTION fn_open_mystery_box(
 )
 RETURNS JSONB AS $$
 DECLARE
-  v_reward JSONB;
   v_reward_type reward_type;
   v_reward_value JSONB;
 BEGIN
   -- Random reward selection
-  SELECT * INTO v_reward_type, v_reward_value
+  SELECT type, value
+  INTO v_reward_type, v_reward_value
   FROM (VALUES
     ('xp_boost', '{"amount": 100}'::JSONB),
     ('xp_boost', '{"amount": 250}'::JSONB),
@@ -1573,7 +1639,12 @@ BEGIN
   
   -- Apply reward
   IF v_reward_type = 'xp_boost' THEN
-    PERFORM fn_add_user_xp(p_user_id, (v_reward_value->>'amount')::INTEGER, 'mystery_box', p_box_id);
+    PERFORM fn_add_user_xp(
+      p_user_id,
+      (v_reward_value->>'amount')::INTEGER,
+      'mystery_box',
+      p_box_id
+    );
   END IF;
   
   -- Update profile

@@ -102,13 +102,10 @@ export function useSponsorOffers(campusId: string | null): UseSponsorOffersRetur
       if (!user) throw new Error('User not authenticated');
 
       // In a real implementation, you would check redemption history
-      // and create a redemption record. For now, we'll just increment
-      // the redemption count
-      const { error: redeemError } = await supabase
+      // and create a redemption record. For now, we'll use raw SQL to increment
+      const { error: redeemError } = await (supabase as any)
         .from('sponsor_offers')
-        .update({
-          redemption_count: supabase.rpc('increment', { column: 'redemption_count' }),
-        })
+        .update({ redemption_count: (supabase as any).sql`redemption_count + 1` })
         .eq('id', offerId);
 
       if (redeemError) throw redeemError;

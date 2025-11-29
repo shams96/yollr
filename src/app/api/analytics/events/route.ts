@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Insert the event
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from('analytics_events')
       .insert({
         event_name: event.eventName,
@@ -54,7 +54,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     
     // Build query based on parameters
-    let query = supabase
+    let query = (supabase as any)
       .from('analytics_events')
       .select('*');
 

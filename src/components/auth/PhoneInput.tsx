@@ -77,7 +77,7 @@ export function PhoneInput({ onSubmit, loading, error }: PhoneInputProps) {
               type="tel"
               value={phone}
               onChange={handlePhoneChange}
-              className="flex-1 pl-3 pr-10 py-3 block w-full rounded-r-md bg-graphite/30 border border-cloud/20 text-cloud placeholder-cloud/50 focus:outline-none focus:border-cosmic-pink focus:ring-2 focus:ring-cosmic-pink/20 focus:neon-glow-pink transition-all duration-200 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 pl-3 pr-10 py-3 block w-full rounded-r-md bg-white border border-cloud/20 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-cosmic-pink focus:ring-2 focus:ring-cosmic-pink/20 focus:neon-glow-pink transition-all duration-200 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
               placeholder={selectedCountry ? `Enter phone number` : 'Select country first'}
               required
               disabled={loading || !selectedCountry}

@@ -79,7 +79,7 @@ export function useMysteryBoxes(userId: string | null): UseMysteryBoxesReturn {
 
       if (profileError) throw profileError;
 
-      setAvailableCount(profileData?.mystery_boxes_available || 0);
+      setAvailableCount((profileData as any)?.mystery_boxes_available || 0);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load mystery boxes');
     } finally {
@@ -110,7 +110,7 @@ export function useMysteryBoxes(userId: string | null): UseMysteryBoxesReturn {
     try {
       setError(null);
       
-      const { data, error: openError } = await supabase.rpc('fn_open_mystery_box', {
+      const { data, error: openError } = await (supabase.rpc as any)('fn_open_mystery_box', {
         p_box_id: boxId,
         p_user_id: userId,
       });
@@ -131,7 +131,7 @@ export function useMysteryBoxes(userId: string | null): UseMysteryBoxesReturn {
     try {
       setError(null);
       
-      const { error: awardError } = await supabase.rpc('fn_award_mystery_box', {
+      const { error: awardError } = await (supabase.rpc as any)('fn_award_mystery_box', {
         p_user_id: userId,
         p_box_type: boxType,
       });

@@ -77,34 +77,43 @@ export default function LoginPage() {
   const handleOTPSubmit = async (otp: string) => {
     setLoading(true);
     setError(null);
-    
+
     try {
       const isDevelopment = process.env.NODE_ENV === 'development';
-      
+
       // For development with mock SMS, accept the mock OTP
       if (isDevelopment && process.env.NEXT_PUBLIC_USE_MOCK_SMS === 'true') {
         if (otp === '123456') {
           console.log('[DEV MODE] Mock OTP verification successful');
+          console.log('[DEV MODE] Bypassing authentication - redirecting to feed');
+
+          // In development mode, just redirect to feed
+          // The app will need to handle the lack of auth session gracefully
           router.push('/feed');
+          setLoading(false);
           return;
         } else {
-          throw new Error('Invalid OTP. Use 123456 for development.');
+          // Set error directly without throwing to avoid console errors
+          console.log('[DEV MODE] Invalid OTP entered:', otp);
+          setError('Invalid OTP. Use 123456 for development.');
+          setLoading(false);
+          return;
         }
       }
-      
+
       const { error } = await supabase.auth.verifyOtp({
         phone,
         token: otp,
         type: 'sms',
       });
-      
+
       if (error) {
         if (error.message?.includes('Invalid OTP')) {
           throw new Error('Invalid OTP. Please check the code and try again.');
         }
         throw error;
       }
-      
+
       router.push('/feed');
     } catch (err: any) {
       console.error('OTP verification error:', err);

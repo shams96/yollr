@@ -34,8 +34,11 @@ export class ErrorBoundary extends Component<Props, State> {
 
     // Log to error monitoring service in production
     if (process.env.NODE_ENV === 'production') {
-      // TODO: Integrate with error monitoring service like Sentry
-      // Sentry.captureException(error, { extra: errorInfo });
+      const { errorMonitoring } = require('@/lib/monitoring/error-monitoring');
+      errorMonitoring.captureException(error, {
+        componentStack: errorInfo.componentStack,
+        errorInfo,
+      });
     }
   }
 

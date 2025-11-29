@@ -1,0 +1,7 @@
+// Stub analytics hook for testing
+export const useAnalytics = () => ({
+  trackPageView: () => {},
+  trackFeatureUsage: () => {},
+  trackUserAction: () => {},
+  trackContentInteraction: () => {},
+});

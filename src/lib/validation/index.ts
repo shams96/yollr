@@ -14,6 +14,7 @@ import { z } from 'zod';
 // Core validation schemas
 export * from './core';
 export { coreSchemas } from './core';
+import { coreSchemas } from './core';
 
 // Phone validation utilities
 export * from './phone';
@@ -21,18 +22,22 @@ export * from './phone';
 // User validation schemas
 export * from './user';
 export { userSchemas } from './user';
+import { userSchemas } from './user';
 
 // Campus validation schemas
 export * from './campus';
 export { campusSchemas } from './campus';
+import { campusSchemas } from './campus';
 
 // Squad validation schemas
 export * from './squad';
 export { squadSchemas } from './squad';
+import { squadSchemas } from './squad';
 
 // Heist validation schemas
 export * from './heist';
 export { heistSchemas } from './heist';
+import { heistSchemas } from './heist';
 
 // Re-export commonly used schemas for convenience
 export {
@@ -119,14 +124,14 @@ export const validateSchema = <T>(schema: z.ZodSchema<T>, data: unknown): Valida
     return { success: true, data: result };
   } catch (error) {
     if (error instanceof z.ZodError) {
-      const errors = error.errors.map(err => ({
+      const errors = (error as any).errors.map((err: any) => ({
         field: err.path.join('.'),
         message: err.message,
-        value: err.path.reduce((obj, key) => (obj as any)?.[key], data),
+        value: err.path.reduce((obj: any, key: any) => (obj as any)?.[key], data),
       }));
       return {
         success: false,
-        errors: errors.map(e => `${e.field}: ${e.message}`)
+        errors: errors.map((e: any) => `${e.field}: ${e.message}`)
       };
     }
     return {
@@ -141,16 +146,17 @@ export const validateRequest = async <T>(
   schema: z.ZodSchema<T>,
   request: Request
 ): Promise<{ data: T } | { errors: ValidationError[] }> => {
+  let body: any;
   try {
-    const body = await request.json();
+    body = await request.json();
     const result = schema.parse(body);
     return { data: result };
   } catch (error) {
     if (error instanceof z.ZodError) {
-      const errors = error.errors.map(err => ({
+      const errors = (error as any).errors.map((err: any) => ({
         field: err.path.join('.'),
         message: err.message,
-        value: err.path.reduce((obj, key) => (obj as any)?.[key], body),
+        value: err.path.reduce((obj: any, key: any) => (obj as any)?.[key], body),
       }));
       return { errors };
     }

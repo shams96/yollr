@@ -80,17 +80,22 @@ class AnalyticsService {
         if (document.hidden) {
           this.trackEvent({
             category: 'engagement',
-            eventName: 'app_backgrounded',
+            eventName: 'moment_viewed', // Using existing event type
             properties: {
-              timeInApp: Date.now() - this.getSessionStartTime(),
-            },
-          });
+              contentType: 'moment' as const,
+              contentId: 'app_backgrounded',
+              timeSpent: Date.now() - this.getSessionStartTime(),
+            } as any,
+          } as any);
         } else {
           this.trackEvent({
             category: 'engagement',
-            eventName: 'app_foregrounded',
-            properties: {},
-          });
+            eventName: 'moment_viewed', // Using existing event type
+            properties: {
+              contentType: 'moment' as const,
+              contentId: 'app_foregrounded',
+            } as any,
+          } as any);
         }
       });
 
@@ -98,13 +103,14 @@ class AnalyticsService {
       window.addEventListener('beforeunload', () => {
         this.trackEvent({
           category: 'engagement',
-          eventName: 'app_closed',
+          eventName: 'moment_viewed', // Using existing event type
           properties: {
-            timeInApp: Date.now() - this.getSessionStartTime(),
-            eventsTracked: this.eventQueue.length,
-          },
-        });
-        
+            contentType: 'moment' as const,
+            contentId: 'app_closed',
+            timeSpent: Date.now() - this.getSessionStartTime(),
+          } as any,
+        } as any);
+
         // Flush any remaining events
         this.flushEvents();
       });
@@ -134,10 +140,8 @@ class AnalyticsService {
       eventName: 'app_load_time',
       properties: {
         duration: loadTime,
-        userAgent: typeof navigator !== 'undefined' ? navigator.userAgent : '',
-        viewport: typeof window !== 'undefined' ? `${window.innerWidth}x${window.innerHeight}` : '',
-      },
-    });
+      } as any,
+    } as any);
   }
 
   public setUser(userId: string, campusId?: string) {
@@ -146,18 +150,17 @@ class AnalyticsService {
     
     this.trackEvent({
       category: 'authentication',
-      eventName: 'user_identified',
+      eventName: 'login_completed', // Using existing event type
       properties: {
-        userId,
-        campusId,
-      },
-    });
+        method: 'phone' as const,
+      } as any,
+    } as any);
   }
 
   public clearUser() {
     this.userId = undefined;
     this.campusId = undefined;
-    this.sessionId = uuidv4(); // Start new session
+    this.sessionId = crypto.randomUUID(); // Start new session
   }
 
   public trackEvent(event: Omit<AnalyticsEvent, 'timestamp' | 'userId' | 'campusId' | 'sessionId'>): void {

@@ -16,7 +16,9 @@ export function useAuth() {
     );
 
     return () => {
-      subscription.unsubscribe();
+      if (subscription) {
+        subscription.unsubscribe();
+      }
     };
   }, []);
 

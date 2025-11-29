@@ -64,11 +64,15 @@ export interface Database {
           campus_type: Database["public"]["Enums"]["campus_type"];
           domain: string | null;
           location: unknown | null;
+          latitude: number | null;
+          longitude: number | null;
+          zip_code: string | null;
           address: string | null;
           city: string | null;
           state: string | null;
           country: string | null;
           timezone: string;
+          enrollment: number;
           primary_color: string | null;
           secondary_color: string | null;
           logo_url: string | null;
@@ -84,11 +88,15 @@ export interface Database {
           campus_type: Database["public"]["Enums"]["campus_type"];
           domain?: string | null;
           location?: unknown | null;
+          latitude?: number | null;
+          longitude?: number | null;
+          zip_code?: string | null;
           address?: string | null;
           city?: string | null;
           state?: string | null;
           country?: string | null;
           timezone?: string;
+          enrollment?: number;
           primary_color?: string | null;
           secondary_color?: string | null;
           logo_url?: string | null;
@@ -104,11 +112,15 @@ export interface Database {
           campus_type?: Database["public"]["Enums"]["campus_type"];
           domain?: string | null;
           location?: unknown | null;
+          latitude?: number | null;
+          longitude?: number | null;
+          zip_code?: string | null;
           address?: string | null;
           city?: string | null;
           state?: string | null;
           country?: string | null;
           timezone?: string;
+          enrollment?: number;
           primary_color?: string | null;
           secondary_color?: string | null;
           logo_url?: string | null;
@@ -386,6 +398,7 @@ export interface Database {
           vote_count: number;
           position: number;
           created_at: string;
+          updated_at: string;
         };
         Insert: {
           id?: string;
@@ -394,6 +407,7 @@ export interface Database {
           vote_count?: number;
           position: number;
           created_at?: string;
+          updated_at?: string;
         };
         Update: {
           id?: string;
@@ -402,6 +416,7 @@ export interface Database {
           vote_count?: number;
           position?: number;
           created_at?: string;
+          updated_at?: string;
         };
         Relationships: [
           {
@@ -551,6 +566,7 @@ export interface Database {
           video_url: string | null;
           vote_count: number;
           is_winner: boolean;
+          is_active: boolean;
           created_at: string;
           updated_at: string;
         };
@@ -564,6 +580,7 @@ export interface Database {
           video_url?: string | null;
           vote_count?: number;
           is_winner?: boolean;
+          is_active?: boolean;
           created_at?: string;
           updated_at?: string;
         };
@@ -577,6 +594,7 @@ export interface Database {
           video_url?: string | null;
           vote_count?: number;
           is_winner?: boolean;
+          is_active?: boolean;
           created_at?: string;
           updated_at?: string;
         };
@@ -731,6 +749,50 @@ export interface Database {
             columns: ["athletics_event_id"];
             isOneToOne: false;
             referencedRelation: "athletics_events";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      bell_events: {
+        Row: {
+          id: string;
+          campus_id: string;
+          triggered_at: string;
+          expires_at: string;
+          participants_count: number;
+          moments_count: number;
+          is_active: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          campus_id: string;
+          triggered_at: string;
+          expires_at: string;
+          participants_count?: number;
+          moments_count?: number;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          campus_id?: string;
+          triggered_at?: string;
+          expires_at?: string;
+          participants_count?: number;
+          moments_count?: number;
+          is_active?: boolean;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "bell_events_campus_id_fkey";
+            columns: ["campus_id"];
+            isOneToOne: false;
+            referencedRelation: "campuses";
             referencedColumns: ["id"];
           }
         ];
@@ -1207,6 +1269,289 @@ export interface Database {
           {
             foreignKeyName: "moderation_queue_moderator_id_fkey";
             columns: ["moderator_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      analytics_events: {
+        Row: {
+          id: string;
+          event_name: string;
+          category: string;
+          user_id: string | null;
+          campus_id: string | null;
+          session_id: string;
+          properties: Json;
+          timestamp: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          event_name: string;
+          category: string;
+          user_id?: string | null;
+          campus_id?: string | null;
+          session_id: string;
+          properties?: Json;
+          timestamp?: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          event_name?: string;
+          category?: string;
+          user_id?: string | null;
+          campus_id?: string | null;
+          session_id?: string;
+          properties?: Json;
+          timestamp?: string;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "analytics_events_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "analytics_events_campus_id_fkey";
+            columns: ["campus_id"];
+            isOneToOne: false;
+            referencedRelation: "campuses";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      analytics_sessions: {
+        Row: {
+          id: string;
+          user_id: string | null;
+          campus_id: string | null;
+          start_time: string;
+          end_time: string | null;
+          duration_seconds: number | null;
+          device_info: Json;
+          location_info: Json;
+          event_count: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id: string;
+          user_id?: string | null;
+          campus_id?: string | null;
+          start_time?: string;
+          end_time?: string | null;
+          duration_seconds?: number | null;
+          device_info?: Json;
+          location_info?: Json;
+          event_count?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string | null;
+          campus_id?: string | null;
+          start_time?: string;
+          end_time?: string | null;
+          duration_seconds?: number | null;
+          device_info?: Json;
+          location_info?: Json;
+          event_count?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "analytics_sessions_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "analytics_sessions_campus_id_fkey";
+            columns: ["campus_id"];
+            isOneToOne: false;
+            referencedRelation: "campuses";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      analytics_user_properties: {
+        Row: {
+          id: string;
+          user_id: string;
+          property_name: string;
+          property_value: string;
+          timestamp: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          property_name: string;
+          property_value: string;
+          timestamp?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          property_name?: string;
+          property_value?: string;
+          timestamp?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "analytics_user_properties_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      analytics_feature_usage: {
+        Row: {
+          id: string;
+          feature_name: string;
+          user_id: string | null;
+          campus_id: string | null;
+          usage_count: number;
+          last_used: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          feature_name: string;
+          user_id?: string | null;
+          campus_id?: string | null;
+          usage_count?: number;
+          last_used?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          feature_name?: string;
+          user_id?: string | null;
+          campus_id?: string | null;
+          usage_count?: number;
+          last_used?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "analytics_feature_usage_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "analytics_feature_usage_campus_id_fkey";
+            columns: ["campus_id"];
+            isOneToOne: false;
+            referencedRelation: "campuses";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      analytics_funnels: {
+        Row: {
+          id: string;
+          funnel_name: string;
+          user_id: string | null;
+          campus_id: string | null;
+          step_name: string;
+          step_number: number;
+          properties: Json;
+          timestamp: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          funnel_name: string;
+          user_id?: string | null;
+          campus_id?: string | null;
+          step_name: string;
+          step_number: number;
+          properties?: Json;
+          timestamp?: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          funnel_name?: string;
+          user_id?: string | null;
+          campus_id?: string | null;
+          step_name?: string;
+          step_number?: number;
+          properties?: Json;
+          timestamp?: string;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "analytics_funnels_user_id_fkey";
+            columns: ["user_id"];
+            isOneToOne: false;
+            referencedRelation: "profiles";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "analytics_funnels_campus_id_fkey";
+            columns: ["campus_id"];
+            isOneToOne: false;
+            referencedRelation: "campuses";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      analytics_reports: {
+        Row: {
+          id: string;
+          report_name: string;
+          report_type: string;
+          parameters: Json;
+          data: Json;
+          generated_by: string | null;
+          generated_at: string;
+          expires_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          report_name: string;
+          report_type: string;
+          parameters?: Json;
+          data: Json;
+          generated_by?: string | null;
+          generated_at?: string;
+          expires_at?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          report_name?: string;
+          report_type?: string;
+          parameters?: Json;
+          data?: Json;
+          generated_by?: string | null;
+          generated_at?: string;
+          expires_at?: string | null;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "analytics_reports_generated_by_fkey";
+            columns: ["generated_by"];
             isOneToOne: false;
             referencedRelation: "profiles";
             referencedColumns: ["id"];

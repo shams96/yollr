@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@/lib/supabase/server';
 import { getDistance } from 'geolib';
+import type { Database } from '@/types/database';
 
 interface GeoInferRequest {
   latitude: number;
@@ -8,24 +9,17 @@ interface GeoInferRequest {
   zip_code?: string;
 }
 
-interface Campus {
-  id: string;
-  name: string;
-  city: string;
-  state: string;
-  zip_code: string;
-  latitude: number;
-  longitude: number;
-  student_count: number;
-  logo_url?: string;
+type CampusRow = Database['public']['Tables']['campuses']['Row'];
+
+interface Campus extends CampusRow {
   distance_miles?: number;
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createServerClient();
+    const supabase = await createServerClient();
     const body: GeoInferRequest = await request.json();
-    
+
     // Verify user is authenticated
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
@@ -41,7 +35,7 @@ export async function POST(request: NextRequest) {
     const { data, error } = await supabase
       .from('campuses')
       .select('*')
-      .order('student_count', { ascending: false });
+      .order('enrollment', { ascending: false });
 
     if (error) {
       console.error('Error fetching campuses:', error);
@@ -55,19 +49,22 @@ export async function POST(request: NextRequest) {
 
     // If we have coordinates, calculate distances and sort by proximity
     if (body.latitude && body.longitude) {
-      campuses = campuses.map(campus => ({
-        ...campus,
-        distance_miles: getDistance(
-          { latitude: body.latitude, longitude: body.longitude },
-          { latitude: campus.latitude, longitude: campus.longitude }
-        ) / 1609.34 // Convert meters to miles
-      })).sort((a, b) => (a.distance_miles || 0) - (b.distance_miles || 0));
-    } 
+      campuses = campuses
+        .filter(campus => campus.latitude && campus.longitude)
+        .map(campus => ({
+          ...campus,
+          distance_miles: getDistance(
+            { latitude: body.latitude, longitude: body.longitude },
+            { latitude: campus.latitude!, longitude: campus.longitude! }
+          ) / 1609.34 // Convert meters to miles
+        }))
+        .sort((a, b) => (a.distance_miles || 0) - (b.distance_miles || 0));
+    }
     // If we have ZIP code, filter by ZIP prefix
     else if (body.zip_code) {
       const zipPrefix = body.zip_code.substring(0, 3);
-      campuses = campuses.filter(campus => 
-        campus.zip_code.startsWith(zipPrefix)
+      campuses = campuses.filter(campus =>
+        campus.zip_code?.startsWith(zipPrefix)
       );
     }
 

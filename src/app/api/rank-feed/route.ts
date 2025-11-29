@@ -4,7 +4,7 @@ import { handleApiError, createErrorResponse, AppError, createError } from '@/li
 
 export async function POST(request: NextRequest) {
   try {
-    const supabase = createServerClient();
+    const supabase = await createServerClient();
     const { campus_id, cursor, limit = 10 } = await request.json();
 
     if (!campus_id) {

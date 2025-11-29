@@ -212,11 +212,11 @@ export default function CampusSelectionPage() {
         .select('id')
         .eq('user_id', user.id)
         .is('left_at', null)
-        .single();
+        .single() as { data: { id: string } | null };
 
       if (existingMembership) {
         // Update existing membership
-        const { error } = await supabase
+        const { error } = await (supabase as any)
           .from('campus_memberships')
           .update({ campus_id: selectedCampus })
           .eq('id', existingMembership.id);
@@ -224,7 +224,7 @@ export default function CampusSelectionPage() {
         if (error) throw error;
       } else {
         // Create new membership
-        const { error } = await supabase
+        const { error } = await (supabase as any)
           .from('campus_memberships')
           .insert({
             user_id: user.id,
@@ -235,7 +235,7 @@ export default function CampusSelectionPage() {
       }
 
       // Award XP for joining campus
-      await supabase.rpc('award_xp', {
+      await (supabase as any).rpc('award_xp', {
         user_id: user.id,
         amount: 50,
         reason: 'joined_campus',

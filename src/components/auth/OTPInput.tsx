@@ -121,7 +121,7 @@ export function OTPInput({ onSubmit, onResend, loading, error, phone }: OTPInput
                 onChange={(e) => handleChange(index, e.target.value)}
                 onKeyDown={(e) => handleKeyDown(index, e)}
                 onPaste={handlePaste}
-                className="w-12 h-12 text-center text-lg font-bold bg-graphite/30 border border-cloud/20 rounded-md text-cloud focus:outline-none focus:border-cosmic-pink focus:ring-2 focus:ring-cosmic-pink/20 focus:neon-glow-pink transition-all duration-200 haptic-tap disabled:opacity-50 disabled:cursor-not-allowed transform focus:scale-105"
+                className="w-12 h-12 text-center text-lg font-bold bg-white border border-cloud/20 rounded-md text-gray-900 focus:outline-none focus:border-cosmic-pink focus:ring-2 focus:ring-cosmic-pink/20 focus:neon-glow-pink transition-all duration-200 haptic-tap disabled:opacity-50 disabled:cursor-not-allowed transform focus:scale-105"
                 maxLength={1}
                 disabled={loading}
                 aria-label={`Digit ${index + 1}`}

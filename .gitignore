@@ -107,6 +107,7 @@ Thumbs.db
 # Temporary folders
 tmp/
 temp/
+.playwright-mcp/
 
 # Database
 *.db
@@ -129,3 +130,4 @@ temp/
 # PWA
 public/sw.js.map
 public/workbox-*.js.map
+nul

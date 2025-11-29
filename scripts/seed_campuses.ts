@@ -59,7 +59,7 @@ async function geocodeZip(zip: string): Promise<{ lat: number; lng: number }> {
     '720': { lat: 34.7465, lng: -92.2896 }, // Little Rock
     '844': { lat: 41.7370, lng: -111.8338 }, // Logan (Utah State)
     '846': { lat: 40.2518, lng: -111.6493 }, // Provo (BYU)
-    '846': { lat: 40.7608, lng: -111.8910 }, // Salt Lake City (Utah)
+    '841': { lat: 40.7608, lng: -111.8910 }, // Salt Lake City (Utah)
   };
 
   return mockCoords[zipPrefix] || { lat: 39.8283, lng: -98.5795 }; // Default to US center
@@ -241,7 +241,7 @@ async function seedCampuses() {
   console.log(`Found ${records.length} colleges in CSV`);
 
   // Process and insert colleges
-  for (const record of records) {
+  for (const record of records as any[]) {
     try {
       const collegeName = record['Name'] || record['INSTNM'] || record['name'];
       const zip = record['ZIP'] || record['zip'] || record['ZIPCODE'];

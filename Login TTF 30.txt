@@ -1,0 +1,115 @@
+Login
+📋 Plan: Frictionless Onboarding & Auto-Account Creation
+Current Problems:
+❌ Landing → Login → OTP → Campus → Profile → Feed (too many steps!) ❌ Requires OTP verification before any interaction ❌ Forces campus selection upfront ❌ No immediate value
+Target Flow (Facebook/Instagram Style):
+✅ Phone number → Auto-create account → Immediate feed access → Progressive profiling ✅ TTF <30 seconds ✅ Profile completion after first interaction ✅ Friend invites auto-connect
+🎯 Phase 1: Simplified Entry (15-20 sec TTF)
+1.1 New Landing Page Experience
+Current: Buttons → Login page → OTP New: Phone input DIRECTLY on landing page
+Landing Page Components:
+├─ Phone input field (prominent)
+├─ "Continue" button
+├─ Auto-detect location for campus suggestion
+├─ "Or join via friend invite" link
+└─ Skip login entirely - just phone number
+1.2 Auto-Account Creation (No OTP Initially)
+Flow:
+User enters phone: (555) 123-4567
+Click "Continue"
+Immediately create account + session (passwordless)
+Show feed instantly with demo campus data
+Background: Send welcome text, create profile record
+Benefits:
+No waiting for OTP
+Instant gratification
+Can verify phone later if needed
+🎯 Phase 2: Smart Campus Detection (5 sec)
+2.1 Geo-Location Auto-Campus
+On Continue click:
+├─ Get user location (if permitted)
+├─ Query nearest campus
+├─ Auto-assign to campus
+├─ Show campus-specific feed immediately
+└─ OR show "Choose your campus" modal (dismissible)
+2.2 Friend Invite Flow
+Invite URL: yollr.app/join/abc123?from=john
+Invite Flow:
+├─ Click invite link
+├─ Enter phone number
+├─ Auto-create account
+├─ Auto-join friend's campus
+├─ Auto-follow inviter
+└─ Land on feed (<20 sec total)
+🎯 Phase 3: Progressive Profiling (After First Action)
+3.1 Profile Completion Triggers
+When to prompt (Facebook style):
+After first moment capture
+After first poll vote
+After first heist submission
+After first 5 minutes of browsing
+3.2 Profile Fields (Relevant Info)
+Profile Completion Modal:
+├─ Display name (optional, defaults to phone)
+├─ Username (optional, auto-generate suggestion)
+├─ Favorite team/sport
+├─ Year (Freshman, Sophomore, etc.)
+├─ Interests (tags: Gaming, Greek Life, etc.)
+└─ Profile picture (optional)
+3.3 Progressive UX
+First visit: Phone → Feed (done!)
+After 1st action: "Complete profile for 100 XP bonus!"
+After 3 days: "Add profile pic to unlock..."
+🎯 Phase 4: Session & Analytics
+4.1 Tracking Without Login
+Track from first phone entry:
+├─ Create anonymous user_id
+├─ Associate with phone number
+├─ Track all actions (views, clicks, time)
+├─ Convert to full profile on completion
+└─ No data loss
+4.2 Phone Verification (Lazy)
+When to verify:
+Before first post/comment (spam prevention)
+Before winning heist prize
+If suspicious activity detected
+After 7 days of use
+How: Simple SMS OTP, non-blocking
+🎯 Phase 5: Implementation Tasks
+Task Breakdown:
+Landing Page Redesign [30 min]
+Add phone input to hero
+Remove "Get Started" redirect
+Auto-location detection
+Passwordless Auth [45 min]
+Create account on phone submit
+Generate session immediately
+Skip OTP verification initially
+Smart Campus Assignment [30 min]
+Geo-location → nearest campus
+Friend invite → same campus
+Manual selection modal (dismissible)
+Progressive Profile Modal [45 min]
+Trigger after first action
+Dismissible with "Later" option
+XP bonus incentive
+Analytics Updates [20 min]
+Track anonymous → authenticated
+TTF measurement
+Conversion funnel
+Database Updates [30 min]
+profiles table: make fields nullable
+Add phone_verified boolean
+Add profile_completed_at timestamp
+📊 Success Metrics
+Target KPIs:
+TTF: <30 seconds (phone to feed)
+Registration completion: >80%
+Profile completion: >60% within 7 days
+D1 retention: >40%
+🔒 Security Considerations
+Rate limiting: 3 accounts per phone number
+Spam prevention: Require verification before posting
+Friend invites: Track abuse patterns
+Phone validation: Basic format check only initially
+Should I proceed with implementing this frictionless onboarding flow?

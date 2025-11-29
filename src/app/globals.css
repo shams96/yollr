@@ -2,150 +2,103 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Yollr CSS Variables */
-:root {
-  --electric-peach: #FF7A5C;
-  --cosmic-pink: #FF5FCC;
-  --cyan-pop: #00E9FF;
-  --lime-pop: #C8FF3D;
-  --midnight: #0A0A0C;
-  --graphite: #232325;
-  --cloud: #F6F6F8;
-  
-  /* Glow colors for animations */
-  --glow-peach: rgba(255, 122, 92, 0.5);
-  --glow-pink: rgba(255, 95, 204, 0.5);
-  --glow-cyan: rgba(0, 233, 255, 0.5);
-  --glow-lime: rgba(200, 255, 61, 0.5);
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+  }
 }
 
-/* Dark mode is default */
-html {
-  color-scheme: dark;
-}
-
-body {
-  color: var(--cloud);
-  background-color: var(--midnight);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  overscroll-behavior: none;
-}
-
-/* Glassmorphism Card Styles */
-.glass-card {
-  background: rgba(35, 35, 37, 0.6);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(246, 246, 248, 0.1);
-  border-radius: 16px;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
-}
-
-.glass-card-hover:hover {
-  background: rgba(35, 35, 37, 0.8);
-  border-color: rgba(246, 246, 248, 0.2);
-  transform: translateY(-2px);
-  transition: all 0.2s ease-out;
-}
-
-/* Gradient Text */
-.gradient-text {
-  background: linear-gradient(135deg, var(--electric-peach), var(--cosmic-pink));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-/* Gradient Buttons */
-.gradient-btn {
-  background: linear-gradient(135deg, var(--electric-peach), var(--cosmic-pink));
-  position: relative;
-  overflow: hidden;
-}
-
-.gradient-btn::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  transition: left 0.5s;
-}
-
-.gradient-btn:hover::before {
-  left: 100%;
-}
-
-/* Neon Glow Effects */
-.neon-glow-peach {
-  box-shadow: 0 0 10px var(--glow-peach);
-}
-
-.neon-glow-pink {
-  box-shadow: 0 0 10px var(--glow-pink);
-}
-
-.neon-glow-cyan {
-  box-shadow: 0 0 10px var(--glow-cyan);
-}
-
-.neon-glow-lime {
-  box-shadow: 0 0 10px var(--glow-lime);
-}
-
-/* Haptic Feedback Classes */
-.haptic-tap:active {
-  transform: scale(0.95);
-}
-
-.haptic-success {
-  animation: hapticSuccess 0.2s ease-out;
-}
-
-@keyframes hapticSuccess {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.05); }
-  100% { transform: scale(1); }
-}
-
-/* Custom Scrollbar */
-::-webkit-scrollbar {
-  width: 4px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--graphite);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--cloud);
-  border-radius: 2px;
-}
-
-/* Selection Color */
-::selection {
-  background: var(--glow-pink);
-  color: var(--cloud);
-}
-
-/* Focus Styles */
-:focus-visible {
-  outline: 2px solid var(--cosmic-pink);
-  outline-offset: 2px;
-}
-
-/* Disable double-tap zoom on mobile */
-@media (pointer: coarse) {
-  .disable-double-tap {
-    touch-action: manipulation;
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
   }
 }
 
 @layer utilities {
-  .text-balance {
-    text-wrap: balance;
+  /* Gradient text effects */
+  .gradient-text {
+    @apply bg-gradient-to-r from-cosmic-pink via-electric-peach to-energy-lime bg-clip-text text-transparent;
+  }
+
+  .animate-gradient {
+    background-size: 200% 200%;
+    animation: gradient 3s ease infinite;
+  }
+
+  @keyframes gradient {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+
+  /* Glass morphism effects */
+  .glass-card {
+    @apply bg-graphite/40 backdrop-blur-xl border border-cloud/10 rounded-2xl shadow-xl;
+  }
+
+  .glass-card-hover {
+    @apply transition-all duration-300 hover:bg-graphite/60 hover:border-cloud/20 hover:shadow-2xl;
+  }
+
+  /* Neon glow effects */
+  .neon-glow-pink {
+    box-shadow: 0 0 20px rgba(255, 45, 149, 0.3), 0 0 40px rgba(255, 45, 149, 0.2);
+  }
+
+  .neon-glow-peach {
+    box-shadow: 0 0 20px rgba(255, 107, 53, 0.3), 0 0 40px rgba(255, 107, 53, 0.2);
+  }
+
+  /* Gradient buttons */
+  .gradient-btn {
+    @apply bg-gradient-to-r from-cosmic-pink to-electric-peach hover:from-electric-peach hover:to-cosmic-pink transition-all duration-300;
+  }
+
+  /* Haptic feedback simulation */
+  .haptic-tap {
+    @apply active:scale-95 transition-transform duration-150;
   }
 }

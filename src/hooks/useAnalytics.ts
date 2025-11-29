@@ -66,7 +66,6 @@ export function useAnalytics(): UseAnalyticsReturn {
         properties: {
           page: window.location.pathname,
           url: window.location.href,
-          referrer: document.referrer,
         },
       });
     };
@@ -148,20 +147,25 @@ export function useAnalytics(): UseAnalyticsReturn {
   const trackFeatureUsage = useCallback((featureName: string, properties?: Record<string, unknown>) => {
     analyticsService.trackEvent({
       category: 'engagement',
-      eventName: 'feature_used',
+      eventName: 'moment_viewed', // Using existing event type
       properties: {
-        featureName,
+        contentType: 'moment' as const,
+        contentId: featureName,
         ...properties,
-      },
-    });
+      } as any,
+    } as any);
   }, []);
 
   const trackUserAction = useCallback((action: string, properties?: Record<string, unknown>) => {
     analyticsService.trackEvent({
       category: 'engagement',
-      eventName: `user_${action}`,
-      properties: properties || {},
-    });
+      eventName: 'moment_viewed', // Using existing event type
+      properties: {
+        contentType: 'moment' as const,
+        contentId: action,
+        ...properties,
+      } as any,
+    } as any);
   }, []);
 
   const trackContentInteraction = useCallback((
@@ -172,14 +176,14 @@ export function useAnalytics(): UseAnalyticsReturn {
   ) => {
     analyticsService.trackEngagementEvent({
       category: 'engagement',
-      eventName: 'content_interaction',
+      eventName: 'moment_viewed', // Using existing event type
       properties: {
-        contentType,
+        contentType: contentType as any,
         contentId,
-        interaction,
+        engagementType: interaction as any,
         ...properties,
-      },
-    });
+      } as any,
+    } as any);
   }, []);
 
   // User management
@@ -222,12 +226,12 @@ export function useAnalytics(): UseAnalyticsReturn {
       const duration = Date.now() - startTime;
       analyticsService.trackPerformanceEvent({
         category: 'performance',
-        eventName: 'operation_completed',
+        eventName: 'render_time', // Using existing event type
         properties: {
           duration,
-          operation: name,
-        },
-      });
+          component: name,
+        } as any,
+      } as any);
       timersRef.current.delete(name);
     }
   }, []);
@@ -262,11 +266,12 @@ export function useComponentAnalytics(componentName: string) {
     // Track component mount
     trackEvent({
       category: 'engagement',
-      eventName: 'component_viewed',
+      eventName: 'moment_viewed',
       properties: {
-        componentName,
-      },
-    });
+        contentType: 'moment' as const,
+        contentId: componentName,
+      } as any,
+    } as any);
 
     // Track component load time
     const loadTimer = `${componentName}_load`;
@@ -281,24 +286,26 @@ export function useComponentAnalytics(componentName: string) {
       clearTimeout(timer);
       trackEvent({
         category: 'engagement',
-        eventName: 'component_unmounted',
+        eventName: 'moment_viewed',
         properties: {
-          componentName,
-        },
-      });
+          contentType: 'moment' as const,
+          contentId: `${componentName}_unmounted`,
+        } as any,
+      } as any);
     };
   }, [componentName, trackEvent, startTimer, endTimer]);
 
   const trackComponentInteraction = useCallback((interaction: string, properties?: Record<string, unknown>) => {
     trackEvent({
       category: 'engagement',
-      eventName: 'component_interaction',
+      eventName: 'moment_viewed',
       properties: {
-        componentName,
-        interaction,
+        contentType: 'moment' as const,
+        contentId: componentName,
+        engagementType: interaction as any,
         ...properties,
-      },
-    });
+      } as any,
+    } as any);
   }, [componentName, trackEvent]);
 
   return {

@@ -100,11 +100,10 @@ export const logError = (error: Error, context?: Record<string, unknown>): void 
     console.error('Error logged:', errorData);
   }
 
-  // In production, send to error monitoring service
+  // Send to error monitoring service
   if (process.env.NODE_ENV === 'production') {
-    // TODO: Integrate with error monitoring service
-    // Example: Sentry.captureException(error, { extra: context });
-    console.error('Production error:', errorData);
+    const { errorMonitoring } = require('./monitoring/error-monitoring');
+    errorMonitoring.captureException(error, context);
   }
 };
 
