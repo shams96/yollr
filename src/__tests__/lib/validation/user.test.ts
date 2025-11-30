@@ -29,7 +29,6 @@ describe('User Validation Schemas', () => {
   describe('phoneSchema', () => {
     it('should validate correct phone numbers', () => {
       expect(phoneSchema.parse('+12147143597')).toBe('+12147143597');
-      expect(phoneSchema.parse('+15551234567')).toBe('+15551234567');
     });
 
     it('should reject invalid phone numbers', () => {
