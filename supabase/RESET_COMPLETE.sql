@@ -85,8 +85,7 @@ CREATE TABLE polls (
   question TEXT NOT NULL,
   options JSONB NOT NULL,
   created_at TIMESTAMP DEFAULT NOW(),
-  expires_at TIMESTAMP NOT NULL,
-  is_active BOOLEAN GENERATED ALWAYS AS (expires_at > NOW()) STORED
+  expires_at TIMESTAMP NOT NULL
 );
 
 CREATE INDEX idx_polls_campus_id ON polls(campus_id);
@@ -114,8 +113,7 @@ CREATE TABLE moments (
   caption TEXT,
   drop_id UUID,
   created_at TIMESTAMP DEFAULT NOW(),
-  expires_at TIMESTAMP NOT NULL,
-  is_active BOOLEAN GENERATED ALWAYS AS (expires_at > NOW()) STORED
+  expires_at TIMESTAMP NOT NULL
 );
 
 CREATE INDEX idx_moments_campus_id ON moments(campus_id);
@@ -296,7 +294,7 @@ SELECT
   COUNT(v.id) as vote_count
 FROM polls p
 LEFT JOIN poll_votes v ON p.id = v.poll_id
-WHERE p.is_active
+WHERE p.expires_at > NOW()
 GROUP BY p.id, p.question, p.options, p.campus_id, v.option_index;
 
 -- View: Weekly leaderboard

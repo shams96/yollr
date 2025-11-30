@@ -56,7 +56,7 @@ export interface Poll {
   options: [string, string, string, string];
   created_at: string;
   expires_at: string;
-  is_active: boolean;
+  // Note: Check expires_at > NOW() client-side for is_active status
 }
 
 export interface PollVote {
@@ -76,7 +76,7 @@ export interface Moment {
   drop_id?: string | null;
   created_at: string;
   expires_at: string;
-  is_active: boolean;
+  // Note: Check expires_at > NOW() client-side for is_active status
 }
 
 export interface Drop {
