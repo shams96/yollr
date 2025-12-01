@@ -1,106 +1,146 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
-import { createClient } from '@/lib/supabase-client'
+import { votePoll, getPollResults, getTimeRemaining, isExpired } from '@/lib/services/poll-service'
 import type { Poll } from '@/types/mvp'
 
 interface PollCardProps {
   poll: Poll
-  userId: string
+  deviceId: string
+  campusId: string
   onVoteComplete?: () => void
 }
 
-export function PollCard({ poll, userId, onVoteComplete }: PollCardProps) {
+export function PollCard({ poll, deviceId, campusId, onVoteComplete }: PollCardProps) {
   const [selectedOption, setSelectedOption] = useState<number | null>(null)
   const [voting, setVoting] = useState(false)
   const [voted, setVoted] = useState(false)
-  const [results, setResults] = useState<Record<number, number>>({})
+  const [results, setResults] = useState<Record<number, { votes: number; percentage: number }>>({})
+  const [error, setError] = useState<string | null>(null)
+  const [timeRemaining, setTimeRemaining] = useState(getTimeRemaining(poll.expires_at))
+
+  // Update time remaining
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTimeRemaining(getTimeRemaining(poll.expires_at))
+    }, 60000) // Update every minute
+
+    return () => clearInterval(interval)
+  }, [poll.expires_at])
+
+  // Load poll results on mount
+  useEffect(() => {
+    const loadResults = async () => {
+      try {
+        const data = await getPollResults(poll.id, deviceId)
+        setResults({
+          0: data.results.option_0,
+          1: data.results.option_1,
+          2: data.results.option_2,
+          3: data.results.option_3,
+        })
+        if (data.user_vote !== null) {
+          setSelectedOption(data.user_vote)
+          setVoted(true)
+        }
+      } catch (err) {
+        console.error('Failed to load results:', err)
+      }
+    }
+
+    loadResults()
+  }, [poll.id, deviceId])
 
   const handleVote = async (optionIndex: number) => {
-    if (voting || voted) return
+    if (voting || voted || isExpired(poll.expires_at)) return
 
     try {
       setVoting(true)
-      const supabase = createClient()
+      setError(null)
 
-      // Insert vote
-      await supabase.from('poll_votes').insert({
-        poll_id: poll.id,
-        user_id: userId,
-        option_index: optionIndex,
-      })
+      // Cast vote
+      await votePoll(poll.id, optionIndex, deviceId, campusId)
 
       // Fetch updated results
-      const { data: votes } = await supabase
-        .from('poll_votes')
-        .select('option_index')
-        .eq('poll_id', poll.id)
-
-      const counts: Record<number, number> = { 0: 0, 1: 0, 2: 0, 3: 0 }
-      votes?.forEach((v) => {
-        counts[v.option_index]++
+      const data = await getPollResults(poll.id, deviceId)
+      setResults({
+        0: data.results.option_0,
+        1: data.results.option_1,
+        2: data.results.option_2,
+        3: data.results.option_3,
       })
-
-      setResults(counts)
       setSelectedOption(optionIndex)
       setVoted(true)
       onVoteComplete?.()
-    } catch (error) {
-      console.error('Vote failed:', error)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to vote')
+      console.error('Vote failed:', err)
     } finally {
       setVoting(false)
     }
   }
 
-  const totalVotes = Object.values(results).reduce((a, b) => a + b, 0)
-  const expiresIn = Math.max(0, Math.floor((new Date(poll.expires_at).getTime() - Date.now()) / 1000 / 3600))
+  const totalVotes = Object.values(results).reduce((sum, opt) => sum + opt.votes, 0)
 
   return (
     <Card className="w-full">
       <CardHeader>
         <div className="flex items-start justify-between">
           <h3 className="text-lg font-semibold text-pure-snow flex-1">{poll.question}</h3>
-          <span className="text-xs text-slate-shadow/60 whitespace-nowrap ml-2">{expiresIn}h left</span>
+          <span className={`text-xs whitespace-nowrap ml-2 ${isExpired(poll.expires_at) ? 'text-danger-red' : 'text-slate-shadow/60'}`}>
+            {timeRemaining}
+          </span>
         </div>
       </CardHeader>
       <CardContent className="space-y-3">
+        {error && (
+          <div className="bg-danger-red/20 border border-danger-red rounded px-3 py-2 text-xs text-danger-red">
+            {error}
+          </div>
+        )}
+
         {(poll.options as string[]).map((option, idx) => {
-          const votes = results[idx] || 0
-          const percentage = totalVotes > 0 ? Math.round((votes / totalVotes) * 100) : 0
+          const optionData = results[idx] || { votes: 0, percentage: 0 }
           const isSelected = selectedOption === idx
+          const isDisabled = voting || voted || isExpired(poll.expires_at)
 
           return (
             <button
               key={idx}
               onClick={() => handleVote(idx)}
-              disabled={voting || voted}
+              disabled={isDisabled}
               className={`w-full p-3 rounded-lg text-left text-sm font-medium transition-all ${
                 voted
                   ? isSelected
                     ? 'bg-neon-mint/20 border border-neon-mint text-pure-snow'
                     : 'bg-slate-shadow border border-slate-shadow/50 text-slate-shadow/70'
-                  : 'bg-slate-shadow hover:bg-slate-shadow/80 border border-slate-shadow/50 text-pure-snow'
+                  : isExpired(poll.expires_at)
+                    ? 'bg-slate-shadow border border-slate-shadow/50 text-slate-shadow/50 cursor-not-allowed'
+                    : 'bg-slate-shadow hover:bg-slate-shadow/80 border border-slate-shadow/50 text-pure-snow cursor-pointer'
               }`}
             >
               <div className="flex items-center justify-between">
                 <span>{option}</span>
-                {voted && <span className="text-xs">{percentage}%</span>}
+                {voted && <span className="text-xs">{optionData.percentage}%</span>}
               </div>
-              {voted && votes > 0 && (
+              {voted && optionData.votes > 0 && (
                 <div className="mt-2 h-2 bg-slate-shadow rounded-full overflow-hidden">
                   <div
                     className="h-full bg-neon-mint transition-all"
-                    style={{ width: `${percentage}%` }}
+                    style={{ width: `${optionData.percentage}%` }}
                   />
                 </div>
               )}
             </button>
           )
         })}
+
         <div className="flex items-center justify-between pt-2 text-xs text-slate-shadow/60">
-          <span>{totalVotes} votes</span>
-          <button className="text-sky-glow hover:underline">Share</button>
+          <span>{totalVotes} {totalVotes === 1 ? 'vote' : 'votes'}</span>
+          <button className="text-sky-glow hover:underline disabled:opacity-50" disabled={voting}>
+            {voting ? '⏳' : '📤'} Share
+          </button>
         </div>
       </CardContent>
     </Card>
