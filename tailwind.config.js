@@ -9,6 +9,16 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        // Pantone 2025/26 - Yollr MVP Palette
+        'ink-black': '#0A0B0D',
+        'slate-shadow': '#1A1B1F',
+        'pure-snow': '#FAFAFA',
+        'neon-mint': '#C2FF72',
+        'soft-lavender': '#C8B5FF',
+        'sky-glow': '#7FE4FF',
+        'peach-soda': '#FFB899',
+        'danger-red': '#FF6F6F',
+        'success-green': '#C4FF4D',
         // Shadcn UI colors
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -34,11 +44,6 @@ module.exports = {
         accent: {
           DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
-          mint: '#00FFC6',
-          sky: '#00D4FF',
-          lilac: '#B794F6',
-          coral: '#FF6B6B',
-          honey: '#FFD93D',
         },
         popover: {
           DEFAULT: "hsl(var(--popover))",
@@ -48,22 +53,15 @@ module.exports = {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        // Yollr App Custom Colors
-        midnight: '#0A0F1C',
-        graphite: '#1A1F2E',
-        cloud: '#E8EAED',
-        'cosmic-pink': '#FF2D95',
-        'electric-peach': '#FF6B35',
-        'energy-lime': '#B4FF39',
-        'sport-purple': '#9D4EDD',
-        'sport-red': '#FF3131',
-        'sport-orange': '#FF6B35',
-        'sport-green': '#00FF94',
       },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
+        card: '14px',
+      },
+      fontFamily: {
+        sans: ['var(--font-sans)', 'system-ui', 'sans-serif'],
       },
     },
   },
