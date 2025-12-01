@@ -1,0 +1,18 @@
+{
+  "crons": [
+    {
+      "path": "/api/heist/cycle",
+      "schedule": "0 * * * *"
+    },
+    {
+      "path": "/api/bell/trigger",
+      "schedule": "0 12 * * *",
+      "description": "Yollr Bell at noon daily"
+    },
+    {
+      "path": "/api/bell/trigger",
+      "schedule": "0 18 * * *",
+      "description": "Yollr Bell at 6pm daily"
+    }
+  ]
+}

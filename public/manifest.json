@@ -1,0 +1,26 @@
+{
+  "name": "Yollr - Campus Social Feed",
+  "short_name": "Yollr",
+  "description": "The viral campus social app that brings your community together through moments, heists, and challenges",
+  "start_url": "/feed",
+  "display": "standalone",
+  "background_color": "#080A0F",
+  "theme_color": "#080A0F",
+  "orientation": "portrait",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/icons/icon-192x192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512x512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "categories": ["social", "education", "lifestyle"]
+}
