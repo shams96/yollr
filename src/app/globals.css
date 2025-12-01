@@ -61,7 +61,7 @@
 @layer utilities {
   /* Gradient text effects */
   .gradient-text {
-    @apply bg-gradient-to-r from-cosmic-pink via-electric-peach to-energy-lime bg-clip-text text-transparent;
+    @apply bg-gradient-to-r from-peach-soda via-soft-lavender to-neon-mint bg-clip-text text-transparent;
   }
 
   .animate-gradient {
@@ -76,25 +76,25 @@
 
   /* Glass morphism effects */
   .glass-card {
-    @apply bg-graphite/40 backdrop-blur-xl border border-cloud/10 rounded-2xl shadow-xl;
+    @apply bg-slate-shadow/40 backdrop-blur-xl border border-pure-snow/10 rounded-2xl shadow-xl;
   }
 
   .glass-card-hover {
-    @apply transition-all duration-300 hover:bg-graphite/60 hover:border-cloud/20 hover:shadow-2xl;
+    @apply transition-all duration-300 hover:bg-slate-shadow/60 hover:border-pure-snow/20 hover:shadow-2xl;
   }
 
   /* Neon glow effects */
   .neon-glow-pink {
-    box-shadow: 0 0 20px rgba(255, 45, 149, 0.3), 0 0 40px rgba(255, 45, 149, 0.2);
+    box-shadow: 0 0 20px rgba(200, 181, 255, 0.3), 0 0 40px rgba(200, 181, 255, 0.2);
   }
 
   .neon-glow-peach {
-    box-shadow: 0 0 20px rgba(255, 107, 53, 0.3), 0 0 40px rgba(255, 107, 53, 0.2);
+    box-shadow: 0 0 20px rgba(255, 184, 153, 0.3), 0 0 40px rgba(255, 184, 153, 0.2);
   }
 
   /* Gradient buttons */
   .gradient-btn {
-    @apply bg-gradient-to-r from-cosmic-pink to-electric-peach hover:from-electric-peach hover:to-cosmic-pink transition-all duration-300;
+    @apply bg-gradient-to-r from-peach-soda to-neon-mint hover:from-neon-mint hover:to-peach-soda transition-all duration-300;
   }
 
   /* Haptic feedback simulation */
