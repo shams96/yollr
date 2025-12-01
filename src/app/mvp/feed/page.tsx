@@ -151,7 +151,14 @@ function FeedPageContent() {
               className="text-2xl hover:scale-110 transition"
               title="Create moment"
             >
-              ➕
+              🎬
+            </button>
+            <button
+              onClick={() => router.push('/mvp/drops/new')}
+              className="text-2xl hover:scale-110 transition"
+              title="Create challenge"
+            >
+              🎯
             </button>
             <button className="text-2xl hover:scale-110 transition">⚙️</button>
           </div>

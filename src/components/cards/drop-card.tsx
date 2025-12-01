@@ -1,5 +1,6 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import type { Drop } from '@/types/mvp'
 
@@ -9,6 +10,8 @@ interface DropCardProps {
 }
 
 export function DropCard({ drop, userSubmitted = false }: DropCardProps) {
+  const router = useRouter()
+
   const phaseInfo = {
     planning: { label: '📋 Planning', color: 'bg-soft-lavender/20 border-soft-lavender' },
     submission: { label: '📹 Submit Your Drop', color: 'bg-neon-mint/20 border-neon-mint' },
@@ -64,17 +67,34 @@ export function DropCard({ drop, userSubmitted = false }: DropCardProps) {
         {/* Actions */}
         <div className="flex gap-2 pt-2">
           {drop.status === 'submission' && !userSubmitted && (
-            <button className="flex-1 bg-neon-mint text-ink-black font-semibold py-2 rounded-lg hover:bg-neon-mint/90 transition text-sm">
+            <button
+              onClick={() => router.push(`/mvp/drops/${drop.id}/submit`)}
+              className="flex-1 bg-neon-mint text-ink-black font-semibold py-2 rounded-lg hover:bg-neon-mint/90 transition text-sm"
+            >
               📹 Submit Plan
             </button>
           )}
+          {drop.status === 'planning' && (
+            <button
+              onClick={() => router.push(`/mvp/drops/${drop.id}`)}
+              className="flex-1 bg-soft-lavender text-ink-black font-semibold py-2 rounded-lg hover:bg-soft-lavender/90 transition text-sm"
+            >
+              👁️ View Challenge
+            </button>
+          )}
           {(drop.status === 'voting' || drop.status === 'execution') && (
-            <button className="flex-1 bg-sky-glow text-ink-black font-semibold py-2 rounded-lg hover:bg-sky-glow/90 transition text-sm">
+            <button
+              onClick={() => router.push(`/mvp/drops/${drop.id}/vote`)}
+              className="flex-1 bg-sky-glow text-ink-black font-semibold py-2 rounded-lg hover:bg-sky-glow/90 transition text-sm"
+            >
               🗳️ View Submissions
             </button>
           )}
-          <button className="flex-1 bg-slate-shadow border border-slate-shadow/50 text-pure-snow font-semibold py-2 rounded-lg hover:bg-slate-shadow/80 transition text-sm">
-            Share
+          <button
+            onClick={() => router.push(`/mvp/drops/${drop.id}`)}
+            className="flex-1 bg-slate-shadow border border-slate-shadow/50 text-pure-snow font-semibold py-2 rounded-lg hover:bg-slate-shadow/80 transition text-sm"
+          >
+            ℹ️ Details
           </button>
         </div>
       </CardContent>
