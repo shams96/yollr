@@ -2,18 +2,15 @@
   "crons": [
     {
       "path": "/api/heist/cycle",
-      "schedule": "0 2 * * *",
-      "description": "Heist phase transitions daily at 2am UTC"
+      "schedule": "0 2 * * *"
     },
     {
       "path": "/api/bell/trigger",
-      "schedule": "0 12 * * *",
-      "description": "Yollr Bell at noon daily"
+      "schedule": "0 12 * * *"
     },
     {
       "path": "/api/bell/trigger",
-      "schedule": "0 18 * * *",
-      "description": "Yollr Bell at 6pm daily"
+      "schedule": "0 18 * * *"
     }
   ]
 }
