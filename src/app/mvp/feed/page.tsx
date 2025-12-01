@@ -142,7 +142,16 @@ export default function FeedPage() {
               <p className="text-xs text-slate-shadow/60">{items.length} posts</p>
             </div>
           </div>
-          <button className="text-2xl hover:scale-110 transition">⚙️</button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => router.push('/mvp/moments/new')}
+              className="text-2xl hover:scale-110 transition"
+              title="Create moment"
+            >
+              ➕
+            </button>
+            <button className="text-2xl hover:scale-110 transition">⚙️</button>
+          </div>
         </div>
       </div>
 
@@ -163,7 +172,9 @@ export default function FeedPage() {
 
         {items.map((item) => (
           <div key={item.id}>
-            {item.type === 'poll' && <PollCard poll={item.data} userId={user.id} />}
+            {item.type === 'poll' && (
+              <PollCard poll={item.data} deviceId={deviceId} campusId={campusId} />
+            )}
             {item.type === 'moment' && (
               <MomentCard moment={item.data} creator={user} />
             )}

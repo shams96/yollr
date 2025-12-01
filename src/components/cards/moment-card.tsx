@@ -1,7 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
+import { getTimeRemaining, isExpired } from '@/lib/services/moments-service'
 import type { Moment, User } from '@/types/mvp'
 
 interface MomentCardProps {
@@ -10,8 +11,17 @@ interface MomentCardProps {
 }
 
 export function MomentCard({ moment, creator }: MomentCardProps) {
-  const [imageError, setImageError] = useState(false)
-  const expiresIn = Math.max(0, Math.floor((new Date(moment.expires_at).getTime() - Date.now()) / 1000 / 3600))
+  const [videoError, setVideoError] = useState(false)
+  const [timeRemaining, setTimeRemaining] = useState(getTimeRemaining(moment.expires_at))
+
+  // Update time remaining
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTimeRemaining(getTimeRemaining(moment.expires_at))
+    }, 60000) // Update every minute
+
+    return () => clearInterval(interval)
+  }, [moment.expires_at])
 
   return (
     <Card className="w-full overflow-hidden">
@@ -20,14 +30,16 @@ export function MomentCard({ moment, creator }: MomentCardProps) {
           <span className="text-2xl">{creator.avatar_emoji}</span>
           <div className="flex-1">
             <p className="font-semibold text-pure-snow text-sm">{creator.username}</p>
-            <p className="text-xs text-slate-shadow/60">{expiresIn}h remaining</p>
+            <p className={`text-xs ${isExpired(moment.expires_at) ? 'text-danger-red' : 'text-slate-shadow/60'}`}>
+              {timeRemaining}
+            </p>
           </div>
         </div>
       </CardHeader>
       <CardContent className="space-y-3">
-        {/* Video Placeholder */}
+        {/* Video Player */}
         <div className="w-full aspect-square bg-slate-shadow rounded-lg overflow-hidden flex items-center justify-center">
-          {imageError ? (
+          {videoError ? (
             <div className="text-center">
               <p className="text-2xl">🎥</p>
               <p className="text-xs text-slate-shadow/60 mt-2">Video unavailable</p>
@@ -37,7 +49,7 @@ export function MomentCard({ moment, creator }: MomentCardProps) {
               src={moment.video_url}
               controls
               className="w-full h-full object-cover"
-              onError={() => setImageError(true)}
+              onError={() => setVideoError(true)}
               poster="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ctext x='8' y='8' text-anchor='middle' dy='.3em' font-size='12'%3E🎥%3C/text%3E%3C/svg%3E"
             />
           )}
