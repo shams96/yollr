@@ -2,7 +2,8 @@
   "crons": [
     {
       "path": "/api/heist/cycle",
-      "schedule": "0 * * * *"
+      "schedule": "0 2 * * *",
+      "description": "Heist phase transitions daily at 2am UTC"
     },
     {
       "path": "/api/bell/trigger",
