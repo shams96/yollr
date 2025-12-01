@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase-client'
 import type { Poll, Moment, Drop, DropSubmission } from '@/types/mvp'
 
-interface FeedItem {
+export interface FeedItem {
   id: string
   type: 'poll' | 'moment' | 'drop_plan' | 'drop_lab'
   timestamp: string

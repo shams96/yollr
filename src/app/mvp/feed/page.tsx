@@ -1,5 +1,8 @@
 'use client'
 
+export const dynamic = 'force-dynamic'
+
+import { Suspense } from 'react'
 import { useEffect, useState, useCallback } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { useInView } from 'react-intersection-observer'
@@ -13,7 +16,7 @@ import { DropCard } from '@/components/cards/drop-card'
 import type { FeedItem } from '@/lib/feed-service'
 import type { Campus, User } from '@/types/mvp'
 
-export default function FeedPage() {
+function FeedPageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { ref, inView } = useInView()
@@ -172,14 +175,14 @@ export default function FeedPage() {
 
         {items.map((item) => (
           <div key={item.id}>
-            {item.type === 'poll' && (
-              <PollCard poll={item.data} deviceId={deviceId} campusId={campusId} />
+            {item.type === 'poll' && deviceId && campusId && (
+              <PollCard poll={item.data as any} deviceId={deviceId} campusId={campusId} />
             )}
             {item.type === 'moment' && (
-              <MomentCard moment={item.data} creator={user} />
+              <MomentCard moment={item.data as any} creator={user} />
             )}
             {(item.type === 'drop_lab' || item.type === 'drop_plan') && (
-              <DropCard drop={item.data} />
+              <DropCard drop={item.data as any} />
             )}
           </div>
         ))}
@@ -192,5 +195,13 @@ export default function FeedPage() {
         )}
       </div>
     </div>
+  )
+}
+
+export default function FeedPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-ink-black text-pure-snow flex items-center justify-center"><p>Loading...</p></div>}>
+      <FeedPageContent />
+    </Suspense>
   )
 }

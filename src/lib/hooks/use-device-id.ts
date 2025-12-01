@@ -1,7 +1,15 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { v4 as uuidv4 } from 'crypto'
+
+// Browser-compatible UUID v4 generator
+function generateUUID() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0
+    const v = c === 'x' ? r : (r & 0x3) | 0x8
+    return v.toString(16)
+  })
+}
 
 // Generate or retrieve device ID from IndexedDB
 export function useDeviceId() {
@@ -35,7 +43,7 @@ export function useDeviceId() {
             setDeviceId(result.value)
           } else {
             // Generate new device ID
-            const newDeviceId = uuidv4()
+            const newDeviceId = generateUUID()
             const writeTransaction = db.transaction('user', 'readwrite')
             const writeStore = writeTransaction.objectStore('user')
             writeStore.put({ key: 'device_id', value: newDeviceId })
@@ -50,7 +58,7 @@ export function useDeviceId() {
           if (stored) {
             setDeviceId(stored)
           } else {
-            const newDeviceId = uuidv4()
+            const newDeviceId = generateUUID()
             localStorage.setItem('device_id', newDeviceId)
             setDeviceId(newDeviceId)
           }
@@ -63,7 +71,7 @@ export function useDeviceId() {
         if (stored) {
           setDeviceId(stored)
         } else {
-          const newDeviceId = uuidv4()
+          const newDeviceId = generateUUID()
           localStorage.setItem('device_id', newDeviceId)
           setDeviceId(newDeviceId)
         }

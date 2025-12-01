@@ -3,14 +3,13 @@
  * Inter font family with semantic text styles
  */
 
-import { Inter } from 'next/font/google';
-
-export const inter = Inter({
-  subsets: ['latin'],
-  weight: ['400', '500', '600', '700'],
+export const inter = {
+  className: '',
   variable: '--font-inter',
-  display: 'swap',
-});
+};
+
+// Note: Google Fonts Inter will be loaded via CSS in globals.css
+// This provides better compatibility with various build environments
 
 export const typography = {
   // Headings
